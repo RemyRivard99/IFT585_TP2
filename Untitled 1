@@ -1,0 +1,20 @@
+
+
+
+
+Host1
+send(msg){
+	sendToMainRouter(LSPacket){
+		wait(receive LSPacket back)
+		then start send packets
+	}
+}
+
+Receiver
+	waitForPacket()
+	then SavePacket
+	then wakeSender
+	
+Sender
+	sendPacket
+	
