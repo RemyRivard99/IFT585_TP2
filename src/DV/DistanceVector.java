@@ -4,21 +4,14 @@ import tp.Link;
 import tp.Router;
 import tp.Sender;
 
+import java.net.DatagramPacket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DistanceVector {
 
-    /**
-     Jsuis pas trop sur de comment t'as implemente tes paquets, mais si tu peux ajouter des types pis tt,
-     on rajoute DISTV, pis la valeur du message c'est la nouvelle valeur "weight" du Node qui est envoyé.
-
-     type de paquet  : "DISTV" {
-     msg = "<ValeurDeDistance>
-     }
-
-     */
     public static void updateTable(int port, String msg, HashMap<Integer, Integer> edgeTable) {
         int newVerticeWeight = Integer.parseInt(msg);
         edgeTable.put(port, newVerticeWeight);
@@ -50,11 +43,12 @@ public class DistanceVector {
         return shortestPath;
     }
 
-    public static void transmitDistanceVector(HashMap<Integer, Integer> edgeTable, Router router, int weight){
-        for(int e = 0; e < edgeTable.size(); e++){
-            //TODO : Faire un paquet avec la valeur "weight" comme msg
-            Sender s = new Sender(router);
+    public static void transmitDistanceVector(HashMap<Integer, Integer> edgeTable, Router router, int weight) throws UnknownHostException {
+        for (Integer port : edgeTable.keySet()) {
+            DatagramPacket dp = PacketFactory.createDvPacket(weight, port);
+
             //TODO : envoyer le paquet par le sender
+            Sender s = new Sender(router);
         }
     }
 

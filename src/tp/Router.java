@@ -84,53 +84,6 @@ public class Router{
 		return this.links;
 	}
 	
-
-
-	public synchronized  ArrayList<DatagramPacket> createLinksPacketList(int to_port) throws UnknownHostException {
-		
-		ArrayList<DatagramPacket> packetList = new ArrayList<DatagramPacket>();
-		
-		for(Link link : this.neighbor) {
-			packetList.add(this.createLinksPacket(to_port));
-		}
-		
-		return packetList;
-		
-	}
-	
-	
-	public synchronized DatagramPacket createLinksPacket(int receiverPort) throws UnknownHostException {
-		
-
-			InetAddress ip = InetAddress.getLocalHost();
-
-			//CREATE THE HEADER
-			String header = "LSP" + "&";
-			
-			for(int i = 0; i < this.neighbor.size(); i++) {
-				header += this.neighbor.get(i).from_port + "," + this.neighbor.get(i).to_port + "," + this.neighbor.get(i).cost + ";";
-				
-			}
-			
-			header += ";;";
-			
-			byte buf[] = header.getBytes();
-			
-			return new DatagramPacket(buf, buf.length, ip, receiverPort);
-
-	}
-	
-	public synchronized DatagramPacket createAckPacket(DatagramPacket packetToACK) throws UnknownHostException {
-		String ACKstring = "ACK";
-
-		
-		byte buf[] = ACKstring.getBytes();
-		InetAddress ip = InetAddress.getLocalHost(); 
-		
-		return  new DatagramPacket(buf, buf.length, ip, packetToACK.getPort());
-		
-	}
-	
 	public synchronized HashMap<String, NodeWeighted> createMap() {
 		HashMap<String, NodeWeighted> map = new HashMap<String,NodeWeighted>();
 		

@@ -1,5 +1,7 @@
 package tp;
 
+import DV.PacketFactory;
+
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.DatagramPacket;
@@ -45,7 +47,7 @@ public class Sender implements Runnable{
 					for(int i = 0; i < this.router.getNeigbor().size(); i++) {
 
 						if(this.router.getNeigbor().get(i).to_port != this.router.lastReceive.port - 1 ) {
-							packetToSend = this.router.createLinksPacket(this.router.getNeigbor().get(i).to_port);
+							packetToSend = PacketFactory.createLinksPacket(this.router.getNeigbor().get(i).to_port, this.router.getNeigbor() );
 							Socket.setSoTimeout(999);
 							sent = false;
 							while(!sent) {

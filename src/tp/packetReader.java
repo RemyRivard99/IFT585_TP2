@@ -4,7 +4,7 @@ import java.net.DatagramPacket;
 import java.util.ArrayList;
 
 public class packetReader {
-	
+
 	String type;
 	ArrayList<Link> links;
 	String msg = null;
@@ -28,7 +28,6 @@ public class packetReader {
 		//Get links
 		String[] linksString = dataList[1].split(";");
 		
-		
 		Link link;
 		ArrayList<Link> temp = new ArrayList<Link>();
 		
@@ -48,4 +47,8 @@ public class packetReader {
 			System.out.println(e);
 		}
 	}
+
+	public String getMessage(){return msg;}
+	public String getType() {return type;}
+	public int getPort(){return port;}
 }
