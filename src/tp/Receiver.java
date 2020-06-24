@@ -1,29 +1,32 @@
 package tp;
+import DV.DVMessageSender;
 import DV.DistanceVector;
 import DV.PacketFactory;
-import algo.*;
-
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 public class Receiver implements Runnable{
-	
+
+	private static final String Arraylist = null;
 	Router router;
 	byte[] receive = new byte[65535];
 	DatagramPacket receivedPacket = new DatagramPacket(receive, receive.length);
-	
-	public Receiver(Router router) 
+	public ArrayList<Link> neighbor;
+	public ArrayList<Link>  links;
+
+	public Receiver(Router router)
 	{
 		this.router = router;
 		Thread thread = new Thread(this,"Receiver");
 		thread.start();
+		this.neighbor = (ArrayList<Link>) this.router.links.clone();
+		this.links = (ArrayList<Link>) this.router.links.clone();
 	}
 
 	@Override
@@ -36,6 +39,9 @@ public class Receiver implements Runnable{
 			int count = 0;
 			int duplicate = 0;
 			ArrayList<Link> toAdd;
+			DatagramPacket packetToSend;
+			Boolean sent = false;
+			Socket.setSoTimeout(100);
 			while(true) 	
 			{
 
@@ -52,12 +58,12 @@ public class Receiver implements Runnable{
 					
 					if(this.router.lastReceive.type.equals("LSP")) {
 						this.router.syncronizing = true;
-						
+
 						//ADD RECEIVED LINKS TO THIS ROUTER LINK
 					try {
 							if(!this.router.lastReceive.links.isEmpty()) {
-								
-									for(int i = 0; i < this.router.lastReceive.links.size(); i ++) 
+
+									for(int i = 0; i < this.router.lastReceive.links.size(); i ++)
 									{
 										this.router.links.add(this.router.lastReceive.links.get(i));
 									}
@@ -65,8 +71,8 @@ public class Receiver implements Runnable{
 					}catch(Exception e) {
 						System.out.println(e);
 					}
-						
-						
+
+
 					}else if(this.router.lastReceive.type.equals("LAST")){
 						
 					}else if(this.router.lastReceive.type.equals("DISTV")) {
@@ -74,11 +80,14 @@ public class Receiver implements Runnable{
 						// transmet son vecteur de distance a tout ses voisins
 						DistanceVector.updateTable(this.router.lastReceive.port, this.router.lastReceive.msg, this.router.edgeTable);
 						int weight = DistanceVector.computeDistanceVector(this.router.links, this.router.edgeTable);
-						DistanceVector.transmitDistanceVector(this.router.edgeTable, this.router, weight);
+						DistanceVector.transmitDistanceVector(this.router.edgeTable, this.router.receivePort, weight);
 
 					}else if(this.router.lastReceive.type.equals("DVP")) {
 						// Quand on recoit un packet du protocole DV avec des donnees,
 						// On le transmet au chemin le plus court du "edgeTable"
+
+						//Affiche les infos du routeur quand le paquet passe
+						System.out.println("hit");
 
 						//Trouve la plus petite valeur du edgeTable
 						int closestPort = -1;
@@ -94,18 +103,19 @@ public class Receiver implements Runnable{
 							it.remove();
 						}
 
-						//TODO : envoie "lastReceived" au port
-						//sendDvPacketToPort(receivedPacket, closestPort);
+						//Envoie le packet recu au prochain router
+						DVMessageSender dvs = new DVMessageSender(receivedPacket, this.router.receivePort, closestPort);
 
 					}else if(!this.router.neighborLinkCheck()){
 						//si un link est deconnectee
 						// transmet son vecteur de distance a tout ses voisins
 						//TODO : Comment on fait pour verifier qu'un link est out?
 						//TODO : Implementer un truc pour trouver le fautif.
+						//TODO : Cancel ca srx.
 						int faultyPort = -1;
 						DistanceVector.removeFromTable(this.router.edgeTable, faultyPort);
 						int weight = DistanceVector.computeDistanceVector(this.router.links, this.router.edgeTable);
-						DistanceVector.transmitDistanceVector(this.router.edgeTable, this.router, weight);
+						DistanceVector.transmitDistanceVector(this.router.edgeTable, this.router.receivePort, weight);
 					}
 				} catch (IOException e) {
 					System.out.println(this.router.name +  " receiving timeout at port: " + this.router.receivePort);

@@ -22,6 +22,17 @@ public class PacketFactory {
         return new DatagramPacket(buf, buf.length, ip, receiverPort);
     }
 
+    public static synchronized DatagramPacket createDvMessagePacket(String data, int receiverPort) throws UnknownHostException {
+        InetAddress ip = InetAddress.getLocalHost();
+        String msg = "DVP" + "&";           //header
+        msg += ";;;";                       //separator
+        msg += data;                        //body
+
+        byte buf[] = msg.getBytes();
+
+        return new DatagramPacket(buf, buf.length, ip, receiverPort);
+    }
+
     public static synchronized DatagramPacket createLinksPacket(int receiverPort, ArrayList<Link> neighbor) throws UnknownHostException {
         InetAddress ip = InetAddress.getLocalHost();
 

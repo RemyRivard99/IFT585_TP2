@@ -130,6 +130,10 @@ public class Router{
 		}
 	}
 
+	public void sendMessageByDV(String message){
+		
+	}
+
 	public boolean neighborLinkCheck(){
 		for(int e = 0; e < edgeTable.size() ; e++) {
 			if(!links.contains(edgeTable.get(e))){

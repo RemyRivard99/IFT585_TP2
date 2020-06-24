@@ -39,16 +39,14 @@ public class DistanceVector {
                 shortestPath = newPath;
             }
         }
-
         return shortestPath;
     }
 
-    public static void transmitDistanceVector(HashMap<Integer, Integer> edgeTable, Router router, int weight) throws UnknownHostException {
+    public static void transmitDistanceVector(HashMap<Integer, Integer> edgeTable, int hostPort, int weight) throws UnknownHostException {
         for (Integer port : edgeTable.keySet()) {
             DatagramPacket dp = PacketFactory.createDvPacket(weight, port);
 
-            //TODO : envoyer le paquet par le sender
-            Sender s = new Sender(router);
+            DVVerticeSender dvs = new DVVerticeSender(weight, hostPort, port);
         }
     }
 
